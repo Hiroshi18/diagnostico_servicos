@@ -63,7 +63,7 @@ class ConnectDatabase:
                 conn.close()
                 print('Database connection closed.')
 
-    def updateAnswer(table, old, new, column_table, column_value):
+    def updateAnswer(table, column_table, new_name, column_name, old_name):
         """ Connect to the SQL database server """
         conn = None
         try:
@@ -79,8 +79,10 @@ class ConnectDatabase:
 
             # execute a statement
             print('Updating Answers')
-            cur.execute("""UPDATE %s SET(%s = %s) WHERE (%s = %s);""",
-                        (table, old, new, column_table, column_value))
+            # cur.execute("""UPDATE %s SET(%s = %s) WHERE (%s = %s);""",
+            #             (table, column_table, new_name, column_name, old_name))
+
+            cur.execute("UPDATE {table} SET {column_table} = '{new_name}' WHERE {column_name} = '{old_name}';".format(table=table, column_table=column_table, new_name=new_name, column_name=column_name, old_name=old_name))
             # close the communication with the SQL
             cur.close()
 
@@ -185,4 +187,4 @@ class ConnectDatabase:
 
 
 if __name__ == '__main__':
-    print((ConnectDatabase.queryAnswerServiceOther('311832')))
+    print((ConnectDatabase.connect()))
