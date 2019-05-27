@@ -15,7 +15,6 @@ def get_orgaos(input):
         else:
             result[orgao_id] = [{'servico_id': servico_id, 'servico_nome': '{0}'.format(servico_nome), 'orgao_nome': '{0}'.format(orgao_nome),
                                  'orgao_id': orgao_id.zfill(8)}]
-
     return result
 
 
