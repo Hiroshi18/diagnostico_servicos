@@ -10,10 +10,10 @@ def get_orgaos(input):
         orgao_id = i['orgao']['id'].split('/')[5]
         orgao_nome = i['orgao']['nomeOrgao']
         if orgao_id in result:
-            result[orgao_id].append({'servico_id': servico_id, 'servico_nome': '{0}'.format(servico_nome), 'orgao_nome': '{0}'.format(orgao_nome,),
+            result[orgao_id].append({'servico_id': servico_id, 'servico_nome': '{0} [{1}]'.format(servico_nome, servico_id), 'orgao_nome': '{0}'.format(orgao_nome,),
                                      'orgao_id': orgao_id.zfill(8)})
         else:
-            result[orgao_id] = [{'servico_id': servico_id, 'servico_nome': '{0}'.format(servico_nome), 'orgao_nome': '{0}'.format(orgao_nome),
+            result[orgao_id] = [{'servico_id': servico_id, 'servico_nome': '{0} [{1}]'.format(servico_nome, servico_id), 'orgao_nome': '{0}'.format(orgao_nome),
                                  'orgao_id': orgao_id.zfill(8)}]
     return result
 
@@ -59,14 +59,14 @@ if __name__ == '__main__':
             # Convert tuples to dict
             orgaos_db = dict((y, x) for x, y in orgaos_db_tp)
             servicos_db = dict((y, x) for x, y in servicos_db_tp)
-            
+
             # The variables are used to in the sort of the table
             i = len(orgaos_db)
             j = len(servicos_db)
-            
+
             # Compare the db with api and insert the difference
             unmatched_orgao = set(orgaos_set.keys()) - set(orgaos_db.keys())
-            for code in unmatched_orgao: 
+            for code in unmatched_orgao:
                 ConnectDatabase.insertAnswer(qid_orgao, code, orgaos_set[code], (i+1), 0, language, 0)
                 i = i+1
                 print(code)
@@ -76,9 +76,8 @@ if __name__ == '__main__':
             for code in unmatched_servico:
                 ConnectDatabase.insertAnswer(qid_servico, code, servicos_set[code], (j+1), 0, language, 0)
                 j=j+1
-                print(code) 
+                print(code)
         except:
             print("Error will try again next day")
-        
+
         time.sleep(86400) # set sleep time here 86400s == 24h
-    
