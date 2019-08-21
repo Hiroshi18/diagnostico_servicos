@@ -1,6 +1,7 @@
 import itertools
 import requests
 from connect_database import ConnectDatabase
+import time
 
 def get_orgaos(input):
     result = {}
@@ -38,20 +39,23 @@ if __name__ == '__main__':
     # Run once every 24 hours
     while True:
         try:
+            print("Start syncdb")
             # Url for the serv.
             url = 'https://www.servicos.gov.br/api/v1/servicos/'
 
             # Variables used to insert into db
             language = 'pt-BR'
-            qid_orgao = qid1  # replace with the question id
-            qid_servico = qid2 # replace with the question id
+            qid_orgao = 1  # replace with the question id
+            qid_servico = 3 # replace with the question id
 
+            print("Get data from API")
             response = requests.get(url)
 
             # Use API and get the serv. and org. and return dict
             orgaos_set = get_orgaos(response.json()['resposta'])
             orgaos_set, servicos_set = get_dataset(orgaos_set)
 
+            print("Get data from database")
             # Connect to db and get tuples with current answer 
             orgaos_db_tp = ConnectDatabase.queryAnswer(qid_orgao)
             servicos_db_tp = ConnectDatabase.queryAnswer(qid_servico)
@@ -63,20 +67,25 @@ if __name__ == '__main__':
             # The variables are used to in the sort of the table
             i = len(orgaos_db)
             j = len(servicos_db)
-
+            print("Compare and see the diference in orgao between API and database")
             # Compare the db with api and insert the difference
             unmatched_orgao = set(orgaos_set.keys()) - set(orgaos_db.keys())
             for code in unmatched_orgao:
-                ConnectDatabase.insertAnswer(qid_orgao, code, orgaos_set[code], (i+1), 0, language, 0)
+                print("Found orgao ", code)
+                ConnectDatabase.insertAnswer(qid_orgao, code, orgaos_set[code] + ' ['+code.lstrip("0")+']', (i+1), 0, language, 0)
                 i = i+1
                 print(code)
-
+            
+            print("Compare and see the diference in servicos between API and database")
             # Compare the db with api and insert the difference
             unmatched_servico = set(servicos_set.keys()) - set(servicos_db.keys())
             for code in unmatched_servico:
-                ConnectDatabase.insertAnswer(qid_servico, code, servicos_set[code], (j+1), 0, language, 0)
+                print("Found servico ", code)
+                ConnectDatabase.insertAnswer(qid_servico, code, servicos_set[code] + ' ['+code.lstrip("0")+']', (j+1), 0, language, 0)
                 j=j+1
                 print(code)
+            
+            print("Finish sync will try again next day")
         except:
             print("Error will try again next day")
 
